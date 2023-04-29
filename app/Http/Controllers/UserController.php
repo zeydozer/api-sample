@@ -23,13 +23,16 @@ class UserController extends Controller
             if ($r->session()->has('token'))
                 $this->result['token'] = $r->session()->get('token');
             else {
-                $user = new User;
-                $user->u_id = $r->u_id;
-                $user->app_id = $r->app_id;
-                $user->lang = $r->lang;
-                $user->os = $r->os;
-                $user->token = Hash::make($user->u_id . ':' . $user->app_id);
-                $user->save();
+                $user = User::find($r->u_id);
+                if (!$user) {
+                    $user = new User;
+                    $user->u_id = $r->u_id;
+                    $user->app_id = $r->app_id;
+                    $user->lang = $r->lang;
+                    $user->os = $r->os;
+                    $user->token = Hash::make($user->u_id . ':' . $user->app_id);
+                    $user->save();
+                }
                 $this->result['token'] = $user->token;
                 $r->session()->put('token', $user->token);
             }
