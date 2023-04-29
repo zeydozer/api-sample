@@ -16,6 +16,18 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\UserController;
 
-Route::controller(UserController::class)->group(function () {
-    Route::post('register', 'store')->middleware(['throttle:register']);
+Route::middleware('throttle:register')
+    ->post('register', [UserController::class, 'store']);
+
+Route::middleware('auth.api')->group(function () {
+    Route::post('purchase', [UserController::class, 'purchase']);
+});
+
+// mock api
+
+use App\Http\Controllers\SubController;
+
+Route::middleware('auth.mock')->group(function () {
+    Route::post('google', [SubController::class, 'check']);
+    Route::post('apple', [SubController::class, 'check']);
 });
