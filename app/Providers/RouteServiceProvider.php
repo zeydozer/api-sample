@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 
+use App\Models\User;
+
 class RouteServiceProvider extends ServiceProvider
 {
     /**
@@ -56,8 +58,21 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function configureRateLimiting()
     {
-        RateLimiter::for('api', function (Request $request) {
+        RateLimiter::for ('api', function (Request $request) {
             return Limit::perMinute(60)->by(optional($request->user())->id ?: $request->ip());
+        });
+
+        RateLimiter::for ('register', function (Request $request) {
+            if ($request->session()->has('u_id')) {
+                $limit = Limit::perMinute(5)->by($request->session()->get('u_id'));
+                $user = User::find($request->session()->get('u_id'));
+                if ($user && $user->token) {
+                    $limit = $limit->response(function () use ($user) {
+                        return response()->json(['token' => $user->token], 200);
+                    });
+                }
+                return $limit;
+            }
         });
     }
 }
