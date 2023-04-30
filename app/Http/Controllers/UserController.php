@@ -44,7 +44,7 @@ class UserController extends Controller
                 'Authorization' => 'Basic ' . base64_encode($r->user->u_id . ':' . $r->user->app_id)
             ])->post('http://api-sample.local/api/' . $r->user->os, [
                 'token' => $r->user->token,
-                'app_id' => $r->app_id,
+                'app_id' => $r->user->app_id,
                 'receipt' => $r->receipt
             ]);
             if ($check->successful()) {
@@ -59,6 +59,8 @@ class UserController extends Controller
                         $subs->app_id = $r->user->app_id;
                     }
                     $subs->finished_at = $resp['expire'];
+                    if ($subs->finished_at < now())
+                        $subs->is_finished = 1;
                     $subs->save();
                     $this->result = new SubscriptionResource($subs);
                 } else {

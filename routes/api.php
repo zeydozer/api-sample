@@ -23,6 +23,8 @@ Route::middleware('throttle:register')
 Route::middleware('auth.api')->group(function () {
     Route::post('purchase', [UserController::class, 'purchase']);
     Route::get('check', [SubController::class, 'check']);
+    Route::get('batch/progress', [SubController::class, 'batchProgress']);
+    Route::get('batch', [SubController::class, 'batch']);
 });
 
 // mock api

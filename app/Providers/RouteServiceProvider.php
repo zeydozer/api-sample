@@ -88,7 +88,7 @@ class RouteServiceProvider extends ServiceProvider
             if (intval($receipt) % 6 == 0)
                 return response()->json(['message' => 'Too many requests'], 429);
             else
-                return Limit::perMinute(1)->by($request->app_id);
+                return Limit::perMinute(1000)->by($request->app_id);
         });
     }
 }
