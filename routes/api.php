@@ -27,7 +27,7 @@ Route::middleware('auth.api')->group(function () {
 
 // mock api
 
-Route::middleware('auth.mock')->group(function () {
+Route::middleware(['auth.mock', 'throttle:mock'])->group(function () {
     Route::post('google', [SubController::class, 'verification']);
     Route::post('apple', [SubController::class, 'verification']);
 });

@@ -43,7 +43,8 @@ class UserController extends Controller
             $check = Http::withHeaders([
                 'Authorization' => 'Basic ' . base64_encode($r->user->u_id . ':' . $r->user->app_id)
             ])->post('http://api-sample.local/api/' . $r->user->os, [
-                // 'token' => $r->user->token,
+                'token' => $r->user->token,
+                'app_id' => $r->app_id,
                 'receipt' => $r->receipt
             ]);
             if ($check->successful()) {

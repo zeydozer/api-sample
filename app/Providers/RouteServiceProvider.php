@@ -64,13 +64,14 @@ class RouteServiceProvider extends ServiceProvider
 
         RateLimiter::for ('register', function (Request $request) {
             if ($request->session()->has('register')) {
-                $limit = Limit::perMinute(5)->by($request->session()->get('register'));
+                $register = $request->session()->get('register');
+                list($u_id, $app_id) = explode(':', $register);
+                $limit = Limit::perMinute(5)->by($u_id);
                 if ($request->session()->has('token')) {
                     $limit = $limit->response(function () use ($request) {
                         return response()->json(['token' => $request->session()->get('token')], 200);
                     });
                 } else {
-                    list($u_id, $app_id) = explode(':', $request->session()->get('register'));
                     $user = User::where('u_id', $u_id)->where('app_id', $app_id)->first();
                     if ($user && $user->token) {
                         $limit = $limit->response(function () use ($user) {
@@ -80,6 +81,14 @@ class RouteServiceProvider extends ServiceProvider
                 }
                 return $limit;
             }
+        });
+
+        RateLimiter::for ('mock', function (Request $request) {
+            $receipt = substr($request->receipt, -2);
+            if (intval($receipt) % 6 == 0)
+                return response()->json(['message' => 'Too many requests'], 429);
+            else
+                return Limit::perMinute(1)->by($request->app_id);
         });
     }
 }
