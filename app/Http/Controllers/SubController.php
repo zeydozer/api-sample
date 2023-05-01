@@ -7,8 +7,6 @@ use App\Models\Subscription;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 
-use Bus, DB;
-
 class SubController extends Controller
 {
     public function verification(Request $r)
@@ -17,7 +15,7 @@ class SubController extends Controller
             $last = substr($r->receipt, -1);
             if (intval($last) % 2 == 1) {
                 $this->result['status'] = true;
-                $expire = new \DateTime('now', new \DateTimeZone('-0600'));
+                $expire = new \DateTime('now', new \DateTimeZone('+0600'));
                 $this->result['expire'] = $expire->format('Y-m-d H:i:s');
             } else {
                 $this->result['status'] = false;
@@ -45,28 +43,12 @@ class SubController extends Controller
         return response()->json($this->result, $this->statusCode);
     }
 
-    public function batch(Request $r)
+    public function callback(Request $r)
     {
-        try {
-            $this->result = Bus::findBatch($r->id);
-        } catch (QueryException $e) {
-            $this->result['message'] = $e->getMessage();
-            $this->statusCode = 500;
-        }
-        return response()->json($this->result, $this->statusCode);
-    }
-
-    public function batchProgress()
-    {
-        try {
-            $batches = DB::table('job_batches')
-                ->where('pending_jobs', '>', 0)
-                ->get();
-            $this->result = $batches;
-        } catch (QueryException $e) {
-            $this->result['message'] = $e->getMessage();
-            $this->statusCode = 500;
-        }
+        if (intval($r->app_id) % 4 == 0)
+            $this->statusCode = 429;
+        else
+            $this->result = $r->all();
         return response()->json($this->result, $this->statusCode);
     }
 }

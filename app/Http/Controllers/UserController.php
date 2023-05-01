@@ -59,8 +59,16 @@ class UserController extends Controller
                         $subs->app_id = $r->user->app_id;
                     }
                     $subs->finished_at = $resp['expire'];
-                    if ($subs->finished_at < now())
+                    if ($subs->finished_at < now()) {
+                        $subs->is_started = 0;
+                        $subs->is_renewed = 0;
                         $subs->is_finished = 1;
+                    } else {
+                        if ($subs->id && $subs->created_at < now())
+                            $subs->is_renewed = 1;
+                        $subs->is_started = 1;
+                        $subs->is_finished = 0;
+                    }
                     $subs->save();
                     $this->result = new SubscriptionResource($subs);
                 } else {

@@ -15,7 +15,7 @@ use Http;
 
 class Subscription implements ShouldQueue
 {
-    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable;
 
     public $data;
     public $auth;
@@ -25,10 +25,11 @@ class Subscription implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($data, $auth)
+    public function __construct(Subs $data, $auth)
     {
         $this->data = $data;
         $this->auth = $auth;
+        $this->onQueue('worker');
     }
 
     /**
@@ -53,9 +54,21 @@ class Subscription implements ShouldQueue
             if ($check->successful()) {
                 $resp = $check->json();
                 if ($resp['status']) {
+                    if ($resp['expire'] < now()) {
+                        $is_started = 0;
+                        $is_renewed = 0;
+                        $is_finished = 1;
+                    } else {
+                        if ($this->data->created_at < now())
+                            $is_renewed = 1;
+                        $is_started = 1;
+                        $is_finished = 0;
+                    }
                     Subs::where('id', $this->data->id)->update([
                         'finished_at' => $resp['expire'],
-                        'is_finished' => $resp['expire'] < now() ? 1 : 0
+                        'is_finished' => $is_finished,
+                        'is_started' => $is_started,
+                        'is_renewed' => $is_renewed,
                     ]);
                 } else
                     $this->release();
@@ -64,10 +77,5 @@ class Subscription implements ShouldQueue
         } catch (QueryException $e) {
             $this->release();
         }
-    }
-
-    public function failed(Exception $e)
-    {
-        // ..
     }
 }

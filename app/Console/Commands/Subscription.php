@@ -42,12 +42,12 @@ class Subscription extends Command
     {
         $datas = Subs::where('is_finished', 0)
             ->where('finished_at', '<', now())
-            ->select('u_id', 'app_id', 'id')
-            ->limit(10000)
+            ->select('u_id', 'app_id', 'id', 'created_at')
+            ->limit(1000)
             ->get();
         if (count($datas) > 0) {
             $auth = $this->option('username') . ':' . $this->option('password');
-            $batch = Bus::batch([])->dispatch();
+            $batch = Bus::batch([])->onQueue('worker')->dispatch();
             foreach ($datas as $data)
                 $batch->add(new SubsJob($data, $auth));
             $this->info(json_encode($batch));

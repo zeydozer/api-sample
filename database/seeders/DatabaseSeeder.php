@@ -29,7 +29,10 @@ class DatabaseSeeder extends Seeder
             DB::table('subscriptions')->insert([
                 'u_id' => $u_id,
                 'app_id' => $app_id,
-                'finished_at' => now()->subDays(rand(-90, 90))->format('Y-m-d H:i:s')
+                'finished_at' => now()->subDays(rand(-90, 90))->format('Y-m-d H:i:s'),
+                'is_finished' => rand(0, 1),
+                'is_started' => rand(0, 1),
+                'is_renewed' => rand(0, 1)
             ]);
         }
     }
