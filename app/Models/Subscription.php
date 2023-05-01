@@ -15,7 +15,11 @@ class Subscription extends Model
     public static function boot()
     {
         parent::boot();
-        
+
+        static::updating(function ($item) {
+            $item->updated_at_date = $item->updated_at->format('Y-m-d');
+        });
+
         static::updated(function ($item) {
             if ($item->is_renewed)
                 Renewed::dispatch($item);
@@ -33,5 +37,11 @@ class Subscription extends Model
             else if ($item->is_finished)
                 Canceled::dispatch($item);
         });
+    }
+
+    public function user()
+    {
+        return $this->hasOne(User::class, 'u_id', 'u_id')
+            ->where('app_id', $this->app_id);
     }
 }

@@ -14,4 +14,10 @@ class User extends Model
     {
         return $this->hasMany(Subscription::class, 'u_id', 'u_id');
     }
+
+    public function subscription()
+    {
+        return $this->hasOne(Subscription::class, 'u_id', 'u_id')
+            ->where('app_id', $this->app_id);
+    }
 }
