@@ -1,7 +1,7 @@
 ## api
 - client-token parametresi auth olunduğunda header dan geliyor
 - mock api için başka uygulama yerine farklı auth kontrolüyle buraya yazdım
-- veritabanının optimize çalışması için flag(lar) kullandım
+- veritabanının optimize çalışması için flag(lar) kullandım ve gerekli kolonlara index ekledim (sql export dosyasında çıkmamış)
 
 ## worker
 - artisan komutu "subs:check" olarak ilerledim
