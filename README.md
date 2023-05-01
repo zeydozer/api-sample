@@ -2,7 +2,7 @@
 - client-token parametresi auth olunduğunda header dan geliyor
 - mock api için başka uygulama yerine farklı auth kontrolüyle buraya yazdım
 - veritabanının optimize çalışması için flag(lar) kullandım
-- veritabanında gerekli kolonlara index ekledim (sql export dosyasında çıkmamış)<br/>
+- veritabanında gerekli kolonlara index ekledim (sql export dosyasında çıkmamış)<br/><br/>
   ```sql
   CREATE INDEX index_name ON table_name (column names) 
   ```
@@ -11,14 +11,14 @@
 - artisan komutu "subs:check" olarak ilerledim
 - queue olarak anlaşılır olması için database kullandım (tercihim redis)
 - işlemlerin kolay takibi ve müdahele edilebilmesi için batchable yaptım
-- mock api rate limite düşen istekler tetikleyici tarafından sonra tekrar denenecek<br/>
+- mock api rate limite düşen istekler tetikleyici tarafından sonra tekrar denenecek<br/><br/>
   ```
   (php artisan queue:retry --queue=worker)
   ```
 
 ## callback
 - api auth kontrolü ve queue ile bu uygulama içerisine yazdım
-- event queue fail istekler tetikleyici tarafından sonra tekrar denenecek<br/>
+- event queue fail istekler tetikleyici tarafından sonra tekrar denenecek<br/><br/>
   ```
   (php artisan queue:retry --queue=callback)
   ```
